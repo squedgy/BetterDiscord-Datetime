@@ -4,7 +4,7 @@ A fairly simple plugin. Allows the transformation of highlighted text into disco
 
 Default binding is `ctrl+o` the bound letter is modifiable.
 
-Supports 12 and 24 hour formats, and should support both major forms of dates.
+Supports 12 and 24 hour formats, and supports both major forms of dates.
 
 ![Different dates being transformed into discord's timestamp format](resources/examples.gif)
 
