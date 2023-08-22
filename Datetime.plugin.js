@@ -60,11 +60,13 @@ const regExps = {
     date: /([012]?[0-9]|3[01])/,
     minutesOrSeconds: /[0-5]?[0-9]/, // I am IGNORING the existance of leap seconds
     hours: /(1[012]|0?[0-9])/,
-    twentyFourHours: /([01]?[0-9]|2[0-3])/, // Technically it allows 24:00, but no. That would be annoying an overly complex
+    twentyFourHours: /([01]?[0-9]|2[0-3])/, // Technically it allows 24:00, but no
     eitherSeparator: /[-\/]/,
-    weekDay: /((mon|tues|wednes|thurs|fri|satur|sun)day)/i,
+    weekDay: /((mon|tues|wednes|thurs|fri|satur|sun)day)/i, // the 'i' flag is redundant given all of these are going to be used in 'join' which applies it on construction
     monthWord: /(January|February|March|April|May|June|July|August|September|October|November|December)/i,
     ampm: /( [ap]m)?/i,
+    space: /\s+/,
+    commaSpace: /,\s+/,
 
     /** @param {(RegExp | string)[]} exps */
     join: (...exps) => new RegExp(exps.map(source).join(""), "i"),
@@ -96,10 +98,16 @@ const acceptedDateFormatsAndTransformations = [
     [
         [
             regExps.join(
-                regExps.weekDay, ", ", regExps.monthWord, " ", regExps.date, ",? ", regExps.year, " ", regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
+                regExps.weekDay, regExps.commaSpace, regExps.monthWord, regExps.space, regExps.date, regExps.commaSpace, regExps.year, regExps.space, regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
             ),
             regExps.join(
-                regExps.weekDay, ", ", regExps.date, " ", regExps.monthWord, " ", regExps.year, " ", regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
+                regExps.weekDay, regExps.commaSpace, regExps.date, regExps.space, regExps.monthWord, regExps.space, regExps.year, regExps.space, regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
+            ),
+            regExps.join(
+                regExps.weekDay, regExps.commaSpace, regExps.monthWord, regExps.space, regExps.date, regExps.commaSpace, regExps.year, regExps.space, regExps.twentyFourHours, ":", regExps.minutesOrSeconds
+            ),
+            regExps.join(
+                regExps.weekDay, regExps.commaSpace, regExps.date, regExps.space, regExps.monthWord, regExps.space, regExps.year, regExps.space, regExps.twentyFourHours, ":", regExps.minutesOrSeconds
             ),
         ],
         matchToDate,
@@ -108,31 +116,25 @@ const acceptedDateFormatsAndTransformations = [
     [
         [
             regExps.join(
-                regExps.monthWord, " ", regExps.date, ",? ", regExps.year, " ", regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
+                regExps.monthWord, regExps.space, regExps.date, regExps.commaSpace, regExps.year, regExps.space, regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
             ),
             regExps.join(
-                regExps.date, " ", regExps.monthWord, " ", regExps.year, " ", regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
+                regExps.monthWord, regExps.space, regExps.date, regExps.commaSpace, regExps.year, regExps.space, regExps.twentyFourHours, ":", regExps.minutesOrSeconds
+            ),
+            regExps.join(
+                regExps.date, regExps.space, regExps.monthWord, regExps.space, regExps.year, regExps.space, regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
+            ),
+            regExps.join(
+                regExps.date, regExps.space, regExps.monthWord, regExps.space, regExps.year, regExps.space, regExps.twentyFourHours, ":", regExps.minutesOrSeconds
             ),
         ],
         matchToDate,
         ":f"
     ],
     [
-    [
         [
-            regExps.join(
-                regExps.monthWord, " ", regExps.date, ",? ", regExps.year, " ", regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
-            ),
-            regExps.join(
-                regExps.date, " ", regExps.monthWord, " ", regExps.year, " ", regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
-            ),
-        ],
-        matchToDate,
-        ":f"
-    ],
-        [
-            regExps.join(regExps.monthWord, " ", regExps.date, ",? ", regExps.year),
-            regExps.join(regExps.date, " ", regExps.monthWord, " ", regExps.year),
+            regExps.join(regExps.monthWord, regExps.space, regExps.date, regExps.commaSpace, regExps.year),
+            regExps.join(regExps.date, regExps.space, regExps.monthWord, regExps.space, regExps.year),
         ],
         matchToDate,
         ":D"
@@ -146,12 +148,18 @@ const acceptedDateFormatsAndTransformations = [
         ":d"
     ],
     [
-        regExps.join(regExps.hours, ":", regExps.minutesOrSeconds, ":", regExps.seconds, regExps.ampm),
+        [
+            regExps.join(regExps.hours, ":", regExps.minutesOrSeconds, ":", regExps.seconds, regExps.ampm),
+            regExps.join(regExps.twentyFourHours, ":", regExps.minutesOrSeconds, ":", regExps.seconds),
+        ],
         matchToTime,
         ":T"
     ],
     [
-        regExps.join(regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm),
+        [
+            regExps.join(regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm),
+            regExps.join(regExps.twentyFourHours, ":", regExps.minutesOrSeconds),
+        ],
         matchToTime,
         ":t"
     ],
@@ -160,32 +168,27 @@ const acceptedDateFormatsAndTransformations = [
 /** @returns {[string, Date, string]} */
 function getDateFromSelection() {
     const selection = getSelectedText()?.trim();
-    console.log({selection});
     const [exec, func, format] = acceptedDateFormatsAndTransformations.reduce((result, [regexp, func, format]) => {
         if(result[0]) return result;
 
         if(Array.isArray(regexp)) {
             return regexp.reduce((result, expression) => {
-                if(result) return result;
+                if(result[0]) return result;
 
                 const ret = [new RegExp(expression).exec(selection), func, format];
-                console.log(ret);
                 return ret;
-            }, null);
+            }, [null, null, null]);
         }
         
         const ret = [new RegExp(regexp).exec(selection), func, format];
-        console.log(ret);
         return ret;
     }, [null, null, null]);
     
     if(!exec) {
-        console.log("no match");
         return [null, null, null];
     }
 
     const date = func(exec);
-    console.log({date});
     if(date.toString().toLowerCase().includes("invalid")) {
         return [null, null, null];
     }
@@ -195,12 +198,10 @@ function getDateFromSelection() {
 
 /** @param {HTMLElement} element */
 function findTextbox(element) {
-    console.log("Starting textbox search from", element);
     let ele = element;
     let prev = null;
     while(ele !== null && ele !== undefined || prev === ele) {
         if(ele.role === "textbox") {
-            console.log("found textbox", ele);
             return ele;
         }
 
@@ -228,7 +229,6 @@ function transformSelection(text, to, format) {
         const textbox = findTextbox(node.parentElement);
         Object.keys(textbox).forEach(key => {
             if(key.startsWith("__reactFiber$")) {
-                if(reactKey) console.log("Overwriting ", reactKey, "with", key);
                 reactKey = key;
             }
         });
@@ -290,9 +290,6 @@ function transformSelection(text, to, format) {
             internal.return,
         );
     }
-
-    console.log(`checked ${checked} fibers and found ${states.size} potential states`);
-    console.log(editor);
     
     const fullSelection = getSelectedText();
     const [before, ...rest] = fullSelection.split(text, 1);
@@ -301,24 +298,7 @@ function transformSelection(text, to, format) {
     if(editor) {
         editor.insertText(`${before}${replacement}${rest.join("")}`);
     } else {
-        console.log("No editor, trying to do dispatch stuff. Probably won't work :(");
-
-        for(const [state, fiber] of states) {
-            console.log("dispatching", fiber, state);
-    
-            BdApi.ReactDOM.flushSync(() => {
-                if(fiber.pendingProps.text === state.memoizedState) {
-                    const [before, ...rest] = state.memoizedState.split(text, 1);
-                    fiber.pendingProps.text = `${before}${replacement}${rest.join("")}`;
-                }
-    
-                state.queue.dispatch(prev => {
-                    const [before, ...rest] = prev.split(text, 1);
-    
-                    return `${before}${replacement}${rest.join("")}`;
-                });
-            });
-        }
+        console.log("No editor :(");
     }
     
 }
@@ -329,13 +309,11 @@ function onKeydown(event) {
     if(!event.ctrlKey) return;
 
     if(settings.formatSelected.includes(event.key.toLowerCase())) {
-        console.log("gathering stuff");
         try {
             const [selection, date, format] = getDateFromSelection();
-            console.log({selection, date, format});
             transformSelection(selection, date, format);
         } catch(E) {
-            console.log(E);
+            console.error(E);
         }
     }
 }
@@ -359,12 +337,10 @@ function stopListeningTo(element) {
 }
 
 const start = () => {
-    console.log("listening to document!");
     document.addEventListener("keydown", onKeydown);
 };
 
 const stop = () => {
-    console.log("stopped listening to document!")
     document.removeEventListener("keydown", onKeydown);
 
     listenTo.elems.forEach(stopListeningTo);
