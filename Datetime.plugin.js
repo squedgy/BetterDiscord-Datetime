@@ -101,10 +101,10 @@ const acceptedDateFormatsAndTransformations = [
                 regExps.weekDay, regExps.commaSpace, regExps.monthWord, regExps.space, regExps.date, regExps.commaSpace, regExps.year, regExps.space, regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
             ),
             regExps.join(
-                regExps.weekDay, regExps.commaSpace, regExps.date, regExps.space, regExps.monthWord, regExps.space, regExps.year, regExps.space, regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
+                regExps.weekDay, regExps.commaSpace, regExps.monthWord, regExps.space, regExps.date, regExps.commaSpace, regExps.year, regExps.space, regExps.twentyFourHours, ":", regExps.minutesOrSeconds
             ),
             regExps.join(
-                regExps.weekDay, regExps.commaSpace, regExps.monthWord, regExps.space, regExps.date, regExps.commaSpace, regExps.year, regExps.space, regExps.twentyFourHours, ":", regExps.minutesOrSeconds
+                regExps.weekDay, regExps.commaSpace, regExps.date, regExps.space, regExps.monthWord, regExps.space, regExps.year, regExps.space, regExps.hours, ":", regExps.minutesOrSeconds, regExps.ampm
             ),
             regExps.join(
                 regExps.weekDay, regExps.commaSpace, regExps.date, regExps.space, regExps.monthWord, regExps.space, regExps.year, regExps.space, regExps.twentyFourHours, ":", regExps.minutesOrSeconds
