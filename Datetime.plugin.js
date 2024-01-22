@@ -20,12 +20,10 @@
  * https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
  */
 
-if(false) {
-    /**
-     * @type {import("./BdApi").BdApi}
-     * @global */
-    var BdApi = this.BdApi;
-}
+/**
+ * @type {import("./BdApi").BdApi}
+ * @global */
+this.BdApi;
 
 /**
  * @typedef {Object} Settings
