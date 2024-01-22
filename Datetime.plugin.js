@@ -20,10 +20,22 @@
  * https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
  */
 
+if(false) {
+    /**
+     * @type {import("./BdApi").BdApi}
+     * @global */
+    var BdApi = this.BdApi;
+}
+
 /**
- * @type {{}} BdApi
+ * @typedef {Object} Settings
+ * @prop {Array.<string>} formatSelected
  */
 
+/**
+ * @param {undefined | Partial<Settings>} settings 
+ * @returns {Settings}
+ */
 function defaultSettings(settings = {}) {
     if(typeof settings.formatSelected === "string") {
         settings.formatSelected = ["o"];
